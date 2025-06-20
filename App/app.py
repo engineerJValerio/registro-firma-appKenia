@@ -20,9 +20,13 @@ if not os.path.exists(EXCEL_FILE):
 def cargar_codigos():
     if not os.path.exists(CODIGOS_FILE):
         return {}
-    with open(CODIGOS_FILE, "r", encoding="utf-8") as f:
+    try:
+        with open(CODIGOS_FILE, "r", encoding="utf-8") as f:
+            return dict(line.strip().split(":", 1) for line in f if ":" in line)
+    except UnicodeDecodeError:
+        with open(CODIGOS_FILE, "r", encoding="latin1") as f:
+            return dict(line.strip().split(":", 1) for line in f if ":" in line)
 
-        return dict(line.strip().split(":", 1) for line in f if ":" in line)
 
 def guardar_codigo(codigo, nombre):
     with open(CODIGOS_FILE, "r", encoding="utf-8") as f:
