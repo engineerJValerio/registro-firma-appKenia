@@ -24,7 +24,7 @@ def cargar_codigos():
         return dict(line.strip().split(":", 1) for line in f if ":" in line)
 
 def guardar_codigo(codigo, nombre):
-    with open(CODIGOS_FILE, "a") as f:
+    with open(CODIGOS_FILE, "r", encoding="utf-8") as f:
         f.write(f"{codigo}:{nombre}\n")
 
 # 🌸 Personalización visual
