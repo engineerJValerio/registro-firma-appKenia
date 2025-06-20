@@ -13,7 +13,7 @@ CODIGOS_FILE = "codigos.txt"
 if not os.path.exists(EXCEL_FILE):
     wb = Workbook()
     ws = wb.active
-    ws.append(["Nombre", "Fecha", "Entrada", "Salida", "Firma", "Comentarios"])
+    ws.append(["Nombre", "Área", "Fecha", "Entrada", "Salida", "Firma", "Comentarios", "Incidencia"])
     wb.save(EXCEL_FILE)
 
 # 🎯 Cargar y guardar códigos
@@ -27,9 +27,8 @@ def cargar_codigos():
         with open(CODIGOS_FILE, "r", encoding="latin1") as f:
             return dict(line.strip().split(":", 1) for line in f if ":" in line)
 
-
 def guardar_codigo(codigo, nombre):
-    with open(CODIGOS_FILE, "r", encoding="utf-8") as f:
+    with open(CODIGOS_FILE, "a", encoding="utf-8") as f:  # "a" para agregar
         f.write(f"{codigo}:{nombre}\n")
 
 # 🌸 Personalización visual
@@ -39,9 +38,6 @@ st.markdown(
     <style>
         body {
             background-color: #fff0f5;
-        }
-        .css-18e3th9 {
-            background-color: #fff0f5 !important;
         }
         .stButton > button {
             background-color: #f78da7;
@@ -83,6 +79,12 @@ else:
 tipo = st.radio("🕓 Tipo de registro:", ["Entrada", "Salida"], horizontal=True)
 comentarios = st.text_area("📝 Comentarios (opcional)")
 
+# Nuevo campo: Incidencia
+incidencia = st.selectbox(
+    "📌 Incidencia (si aplica)",
+    ["Ninguna", "Retardo", "Permiso", "Inasistencia"]
+)
+
 # ✍️ Firma
 st.markdown("### ✍️ Firma del empleado (obligatoria)")
 canvas_result = st_canvas(
@@ -106,7 +108,7 @@ firmado = (
 if st.button("💾 Registrar"):
     if not codigo or len(codigo.strip()) > 8:
         st.error("❌ Código obligatorio (máx 8 caracteres)")
-    elif nuevo and (not nombre or not area):
+    elif nuevo and (not nombre.strip() or not area.strip()):
         st.error("❌ Nombre y área requeridos para nuevos registros")
     elif not firmado:
         st.error("❌ La firma es obligatoria para registrar")
@@ -122,7 +124,7 @@ if st.button("💾 Registrar"):
 
         wb = load_workbook(EXCEL_FILE)
         ws = wb.active
-        ws.append([nombre, fecha, entrada, salida, firma, comentarios])
+        ws.append([nombre, area, fecha, entrada, salida, firma, comentarios, incidencia])
         wb.save(EXCEL_FILE)
 
         st.success(f"✅ Registro exitoso para {nombre}")
